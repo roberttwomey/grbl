@@ -181,6 +181,19 @@ void limits_go_home(uint8_t cycle_mask)
     axislock = 0;
     n_active_axis = 0;
     for (idx=0; idx<N_AXIS; idx++) {
+
+      // roberttwomey added fix for homing with corexy config
+      // at the beginning of each homing axis, zero out the system positions and target position. 
+      // otherwise the pulloff and repeat does not work.
+      #ifdef COREXY
+
+        if ((idx==A_MOTOR)||(idx==B_MOTOR)) { 
+          sys.position[idx] = 0;
+            target[idx] = 0;
+        }
+      #endif
+      // end of roberttwomey fix
+
       // Set target location for active axes and setup computation for homing rate.
       if (bit_istrue(cycle_mask,bit(idx))) {
         n_active_axis++;
